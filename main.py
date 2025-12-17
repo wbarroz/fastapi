@@ -87,9 +87,6 @@ async def ingest_event(event:Event,background_tasks:BackgroundTasks):
 
         # Index into Elasticsearch(analytics)
         #es.index(index=INDEX_NAME,document=event_dict) ### This one is wrong!!!
-        #es.index(index=INDEX_NAME,document=event.dict())
-        # Elasticsearch: analytics (with retry)
-        #index_with_retry(es, INDEX_NAME, event_dict)
         index_with_retry(es, INDEX_NAME, event.dict())
 
         # Async enrichment
@@ -105,26 +102,9 @@ async def ingest_event(event:Event,background_tasks:BackgroundTasks):
                 },
         )
 
-        # Index document into Elasticsearch
-        #es.index(index=INDEX_NAME,document=event.dict())
-        #es.index(index=INDEX_NAME,document=event_dict)
 
         return {"status":"accepted"}
 
-        '''
-    except es_exceptions.ConnectionError:
-        logger.error("elasticsearch_unavailable")
-        raise HTTPException(
-            status_code=503,
-            detail="Search backend unavailable",
-        )
-    except Exception as exc:
-        logger.exception("unexpected error")
-        raise HTTPException(
-            status_code=500,
-            detail="Internal server error",
-        )
-        '''
     except es_exceptions.ConnectionError:
         logger.error("elasticsearch_unavailable_after_retries")
         raise HTTPException(
